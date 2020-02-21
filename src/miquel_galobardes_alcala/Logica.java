@@ -11,7 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import javax.swing.table.DefaultTableModel;
+import java.util.ArrayList;
 
 /**
  *Clase para la lógica del programa.
@@ -37,24 +37,38 @@ public class Logica {
         catch(IOException e){
             System.out.println("EXCEPCION EN CLASE LOGICA, METODO ESCRIBIRENFICHERO");
         }
-    }
+    }   
     
-    void recogerDatos(DefaultTableModel dtm){
+    ArrayList<String[]> getDatos(){
+        ArrayList<String[]> coleccionRows = new ArrayList<>();
         try{
             DataInputStream in = new DataInputStream(new FileInputStream(fichero));
-            String[] producto = new String[4];
             while(in.available()>0){
-               producto[0] = in.readUTF();;
+               String[] producto = new String[4];
+               producto[0] = in.readUTF();
                producto[1] = in.readUTF();
                producto[2] = in.readUTF();
                producto[3] = in.readUTF();
-               dtm.addRow(producto);
+               coleccionRows.add(producto);
             }
-           in.close();
+           in.close();  
         }
         catch (IOException e){
-            System.out.println("jor");
+            System.out.println("El Fichero esta vacio.");
         }
+        return coleccionRows;
     }
+    
+    ArrayList<String[]> buscarProducto(String texto_busqueda){
+        ArrayList<String[]> coleccionRows = getDatos();
+        ArrayList<String[]> coleccionRowsfinal = new ArrayList();
+        coleccionRows.forEach((row) -> {
+            if(row[0].equals(texto_busqueda)){
+                coleccionRowsfinal.add(row); 
+            }
+        });
+        return coleccionRowsfinal;
+    }
+    
     
 }

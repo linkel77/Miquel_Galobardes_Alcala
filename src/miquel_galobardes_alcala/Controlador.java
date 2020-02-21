@@ -3,7 +3,9 @@ package miquel_galobardes_alcala;
 import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
@@ -15,7 +17,6 @@ class Controlador implements ActionListener {
 
     private Grafica grafica;
     private Logica logica;
-    
     /**
      * Constructor que recibe la grafica y la lógica para interactuar entre ellas.
      * @param grafica
@@ -24,8 +25,7 @@ class Controlador implements ActionListener {
     public Controlador(Grafica grafica, Logica logica){
         this.grafica = grafica;
         this.logica = logica;
-        setListenersGrafica();
-        
+        setListenersGrafica();     
     }
     /**
      * Método para setearlos listeners a esta clase.
@@ -40,21 +40,26 @@ class Controlador implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent ae) {
         String command = ae.getActionCommand();
+        ModeloTabla tm = grafica.getTableModel();
         switch (command){
             case "ALTA":
                 this.altaProducto();
                 break;
             case "LISTAR":
-                grafica.setearModeloTabla();
-                DefaultTableModel dtm = grafica.getTableModel();
-                logica.recogerDatos(dtm);
-                dtm.fireTableDataChanged();
+                tm.limpiarDatos();
+                tm.insertarDatos(logica.getDatos());
+                grafica.setTextoNarrador("SE ACABA DE LISTAR EL ARCHIVO.");
                 break;
             case "LIMPIAR":
-                grafica.setearModeloTabla();
+                tm.limpiarDatos();
+                grafica.setTextoNarrador("LISTA LIMPIADA!");
                 break;
             case "BUSCAR":
-                System.out.println("es BUSCAR");
+                tm.limpiarDatos();
+                ArrayList<String[]> datos = logica.buscarProducto(grafica.getCodProductoTexto());
+                String encontrado = (datos.size()>0?"PRODUCTO ENCONTRADO!":"PRODUCTO NO ENCONTRADO!");
+                tm.insertarDatos(datos);
+                grafica.setTextoNarrador(encontrado);
                 break;
             default:
                 break;
@@ -69,7 +74,7 @@ class Controlador implements ActionListener {
         if (result == JOptionPane.OK_OPTION){
             Producto prod = new Producto(v_alta.getValores());
             logica.escribirEnFichero(prod);
-            grafica.getNarrador().setText("PRODUCTO CREADO\n " + prod.toString());
+            grafica.setTextoNarrador("PRODUCTO CREADO\n" + prod.toString());
         }
     }   
 }

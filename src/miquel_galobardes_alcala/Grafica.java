@@ -12,9 +12,8 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.table.DefaultTableModel;
 /**
- *
+ * Clase con todos los componentes gráficos y su construcción/configuración.
  * @author Miquel Galobardes Alcalá.
  */
 public class Grafica extends JFrame{
@@ -27,11 +26,9 @@ public class Grafica extends JFrame{
     private JLabel buscar_productos_label;
     private JTextField buscar_productos_textfield;
     private JTable tabla_productos;
-    private DefaultTableModel dtm;
     private JScrollPane tabla_scrollpane;
-    private Object[][] data;
     private JTextArea narrador_textArea;
-    private final String[] headerTabla = {"codProducto", "Nombre", "Cantidad", "Descripción"};
+    
     
     public Grafica (){
         super("Programa para productos almacenados en .txt"); //Creamos la ventana y ponemos titulo.
@@ -44,7 +41,7 @@ public class Grafica extends JFrame{
      */
     private void crearVentanaMain(){
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); //Para que el programa se pare cuando se cierra la ventana.
-        this.setSize(1000, 800); //Tamaño de la ventana
+        this.setSize(1100, 900); //Tamaño de la ventana
         this.setLocationRelativeTo(null); //Para que la ventana se centre en el monitor que la contenga.
         gbl = new GridBagLayout(); //Creamos el Layout
         gbc = new GridBagConstraints();
@@ -66,6 +63,7 @@ public class Grafica extends JFrame{
         setGridBagConstraintsXY(0,3,3,1,1,0.5);
         this.getContentPane().add(alta_productos_button,gbc);
         setGridBagConstraintsXY(0,4,3,1,1,0.5);
+        alta_productos_button.setFocusable(false);
         this.getContentPane().add(lista_productos_button,gbc);
         setGridBagConstraintsXY(0,5,3,1,1,0.5);
         this.getContentPane().add(limpiar_lista_button,gbc);
@@ -81,6 +79,7 @@ public class Grafica extends JFrame{
         this.getContentPane().add(tabla_scrollpane,gbc);
         setGridBagConstraintsXY(0,6,6,4,1,2);
         this.getContentPane().add(narrador_textArea,gbc);
+        
     }
     /**
      * Método que inicializa las variables de la clase.
@@ -93,11 +92,9 @@ public class Grafica extends JFrame{
         buscar_productos_label = new JLabel("Buscar:");
         buscar_productos_textfield = new JTextField();
         narrador_textArea = new JTextArea("HOLA SOY EL NARRADOR DEL PROGRAMA");        
-        //MODELO DE LA TABLA
-        
-        //INICIACION DE LA TABLA Y INSERTARLA EN EL SCROLL PANE.
-        tabla_productos = new JTable();
-        setearModeloTabla();
+        //INICIACION DE LA TABLA, MODELO Y INSERTARLA EN EL SCROLL PANE.
+        ModeloTabla mt= new ModeloTabla();
+        tabla_productos = new JTable(mt);
         tabla_scrollpane= new JScrollPane(tabla_productos);
         tabla_productos.setFillsViewportHeight(true);   
     }
@@ -124,15 +121,18 @@ public class Grafica extends JFrame{
     private void setFonts(){
         //CREACIÓN DE FUENTES
         Font fuente = new Font("Arial", Font.PLAIN, 40);
-        Font fuente2 = new Font("Arial", Font.PLAIN, 20);
+        Font fuente2 = new Font("Arial", Font.PLAIN, 25);
+        Font fuente3 = new Font("Arial", Font.PLAIN, 35);
         //SETTEO DE FUENTES
         alta_productos_button.setFont(fuente);
         lista_productos_button.setFont(fuente);
         limpiar_lista_button.setFont(fuente);
         buscar_productos_textfield.setFont(fuente);
-        buscar_productos_label.setFont(fuente2);   
+        buscar_productos_label.setFont(fuente2);
+        narrador_textArea.setFont(fuente3);
         narrador_textArea.setBackground(Color.black);
         narrador_textArea.setForeground(Color.white);
+        narrador_textArea.setLineWrap(true);
     }
     /**
      * Setear listeners para que el controlador pueda detectar eventos e identificarlos.
@@ -150,20 +150,25 @@ public class Grafica extends JFrame{
         
     }
     /**
-     * Getter para el JTextArea que contiene el narrador del programa.
+     * Método para setear el texto del narrador del programa.
      * @return narrador_textArea
      */
-    JTextArea getNarrador(){
-        return narrador_textArea;
+    void setTextoNarrador(String texto){
+        narrador_textArea.setText(texto);
     }
     
-    DefaultTableModel getTableModel(){
-        return dtm;
+    /**
+     * Método para obtener el modelo de la tabla
+     * @return modelo de la tabla.
+     */
+    ModeloTabla getTableModel(){
+        return ((ModeloTabla)tabla_productos.getModel());
     }
-    void setearModeloTabla(){
-        dtm = new DefaultTableModel();
-        dtm.setColumnIdentifiers(headerTabla);
-        tabla_productos.setModel(dtm);
-        dtm.fireTableDataChanged();
+    /**
+     * Método para recibir el String que se busca en el fichero.
+     * @return String
+     */
+    String getCodProductoTexto(){
+        return buscar_productos_textfield.getText();
     }
 }
